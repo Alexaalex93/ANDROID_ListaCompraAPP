@@ -2,22 +2,16 @@ package com.example.alex.listacompraapp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 public class ListActivity extends AppCompatActivity {
 
-
-    private int[] checked;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+
 
         String[] nombreProductos = new String[] {
 
@@ -69,28 +63,26 @@ public class ListActivity extends AppCompatActivity {
 
         };
 
+        ListAdapter listAdapter = null;
 
-        ListAdapter listAdapter = new Adapter(this, R.layout.celda, nombreProductos, descripcionProductos);
+        if(savedInstanceState == null) //Si esta vacio el nundle lo creo
+             listAdapter = new Adapter(this, R.layout.celda, nombreProductos, descripcionProductos);
+        else //Si no le meto el valor del array
+        {
+            boolean a [] = savedInstanceState.getBooleanArray("checked");
+            listAdapter = new Adapter(this, R.layout.celda, nombreProductos, descripcionProductos,a );
+        }
+
+
 
 
         ListView listView = (ListView) findViewById(R.id.listViewProductos);
         listView.setAdapter(listAdapter);
 
-     //   checked = new int[nombreProductos.length];
-     //   CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(Menu.NONE,8,8,"Lista seleccionados");
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-
-        return super.onOptionsItemSelected(item);
+    protected void onSaveInstanceState(Bundle outState) { //Guardamos la lista de checked para poder usarlo al cambiar de orientacion
+        outState.putBooleanArray("checked", Adapter.getChecked() ); //static
     }
 }

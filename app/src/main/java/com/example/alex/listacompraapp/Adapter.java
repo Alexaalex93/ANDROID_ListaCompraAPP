@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Arrays;
 
@@ -21,18 +22,36 @@ public class Adapter extends BaseAdapter{
     private int mIdLayoutCelda;
     private String[] mNombreProductos;
     private String[] mDescripcionProductos;
-    private Boolean[] checked;
+    private static boolean[] checked;
 
     public Adapter(Context mContext, int mIdLayoutCelda, String[] mNombreProductos, String[] mDescripcionProductos) {
         this.mContext = mContext;
         this.mIdLayoutCelda = mIdLayoutCelda;
         this.mNombreProductos = mNombreProductos;
         this.mDescripcionProductos = mDescripcionProductos;
-        checked = new Boolean[mNombreProductos.length];
+        checked = new boolean[mNombreProductos.length];
         Arrays.fill(checked, Boolean.FALSE);
     }
+    public Adapter(Context mContext, int mIdLayoutCelda, String[] mNombreProductos, String[] mDescripcionProductos, boolean[] checked){
 
-    public Boolean[] getChecked() {
+        this.mContext = mContext;
+        this.mIdLayoutCelda = mIdLayoutCelda;
+        this.mNombreProductos = mNombreProductos;
+        this.mDescripcionProductos = mDescripcionProductos;
+        this.checked = checked;
+
+    }
+
+    int getResult(boolean... checked) {
+        int count = 0;
+        for (boolean check : checked) {
+            count += (check ? 1 : 0);
+        }
+
+        return count;
+    }
+
+    public static boolean[] getChecked() {
         return checked;
     }
 
@@ -52,7 +71,7 @@ public class Adapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) { //Aquí meter la imagen tambien
 
         if( convertView == null){ //Si es la primera vez que se muestra
 
@@ -60,14 +79,19 @@ public class Adapter extends BaseAdapter{
             convertView = layoutInflater.inflate(mIdLayoutCelda, null);
 
         }
-        CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+        final CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+        checkBox.setChecked(checked[position]);
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-        if(checkBox.isChecked()){
-            checked[position] = true;
-        }
-        else{
-            checked[position] = false;
-        }
+                checked[position] = ((CheckBox) view).isChecked(); //Devuelve boolean
+                int a = getResult(checked);
+                System.out.println(a);
+
+            }
+        });
+
 
         TextView textView_NombreProductos = (TextView) convertView.findViewById(R.id.nombreProductoText);
         TextView textView_DescripcionProductos = (TextView) convertView.findViewById(R.id.descripcionProductoText);
